@@ -1,0 +1,30 @@
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css" />
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+    <meta charset="utf-8">
+    <title>Voting</title>
+</head>
+
+<body>
+    <div id="admin" class="content">
+        <h1>Voter Interface</h1>
+        <p></p>
+        <h1>Curret Candidates</h1>
+        <li v-for="item in candidates">
+            <span class="glyphicon glyphicon-thumbs-up" v-on:click="incrementVotes(item)">^</span>{{item.name}}
+        </li>
+        <h1>Submitted Ballot</h1>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js" integrity="sha256-mpnrJ5DpEZZkwkE1ZgkEQQJW/46CSEh/STrZKOB/qoM=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.7/vue.js" integrity="sha256-g+Q8DFAmG5+eyRPSydX0LY4TfjsL11XSDrIGerbbEdA=" crossorigin="anonymous"></script>
+    <script src="admin.js"></script>
+</body>
+<div class="footer">
+    <a href="admin.html">Admin</a> <br>
+    <a href="https://github.com/sndubbs/Vote">GitHub</a>
+</div>
+
+</html>
