@@ -1,33 +1,43 @@
-/*global Vue */
+/*global Vue axios */
 var app = new Vue({
     el: '#admin',
     data: {
-        candidates: [
-            { name: 'Comment 1', votes: 5 },
-            { name: 'Comment 2', votes: 6 },
-            { name: 'Comment 3', votes: 1 },
-            { name: 'Comment 4', votes: 4 },
-            { name: 'Comment 5', votes: 3 }
-        ],
+        name: "",
+        votes: '',
+        file: null,
+        addCandidate: null,
+        candidates: [],
+        findName: "",
+        findCandidate: null,
         newCandidate: "",
+        ballot: [],
     },
-    created: function() {},
+    created() {
+        this.getCandidates();
+    },
     computed: {
-        sortedCandidates() {
-            return this.candidates.sort((a, b) => {
-                var rval = 0;
-                if (a.votes < b.votes) {
-                    rval = 1;
-                }
-                else if (a.votes > b.votes) {
-                    rval = -1;
-                }
-                return (rval);
-            })
+        suggestions() {
+            return this.candidates.filter(candidate => candidate.name.toLowerCase().startsWith(this.findName.toLowerCase()));
         }
 
     },
     methods: {
+        fileChanged(event) {
+            this.file = event.target.files[0];
+        },
+
+        async upload() {
+            try {
+                let r1 = await axios.post('/api/candidates', {
+                    name: this.name,
+                    votes: this.votes,
+                });
+                this.addCandidate = r1.data;
+            }
+            catch (error) {
+                console.log(error);
+            }
+        },
         async getCandidates() {
             try {
                 let response = await axios.get("/api/candidates");
@@ -38,12 +48,44 @@ var app = new Vue({
                 console.log(error);
             }
         },
-        addCandidate() {
-            this.candidates.push({ name: this.newCandidate, votes: 0 });
-            this.newCandidate = "";
+        selectCandidate(candidate) {
+            this.findName = "";
+            this.findCandidate = candidate;
         },
-        incrementVotes(item) {
-            item.votes = item.votes + 1;
+        async deleteCandidate(candidate) {
+            try {
+                let response = axios.delete("/api/candidates/" + candidate._id);
+                this.findCandidate = null;
+                this.getCandidates();
+                return true;
+            }
+            catch (error) {
+                console.log(error);
+            }
         },
+        async incrementVote(candidate) {
+            try {
+                console.log(candidate);
+                let response = await axios.put("/api/candidates/" + candidate._id, {
+                    votes: candidate.votes,
+                });
+                this.findCandidate = null;
+                this.getCandidates();
+                return true;
+            }
+            catch (error) {
+                console.log(error);
+            }
+        },
+        submitVote() {
+            console.log("Submitting Votes");
+            for (var candidate of this.candidates) {
+                if (candidate.selected) {
+                    console.log(candidate);
+                    this.incrementVote(candidate);
+                    this.ballot.push(candidate);
+                }
+            }
+        }
     }
 });

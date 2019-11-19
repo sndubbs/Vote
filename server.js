@@ -2,15 +2,76 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 const app = express();
-
-// parse application/x-www-form-urlencoded
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: false
 }));
 
-// parse application/json
-app.use(bodyParser.json());
-
 app.use(express.static('public'));
 
-app.listen(3001, () => console.log('Server listening on port 3001!'));
+const mongoose = require('mongoose');
+
+mongoose.connect('mongodb://localhost/candidates', {
+    useNewUrlParser: true
+});
+
+var CandidateSchema = new mongoose.Schema({
+  name: String,
+  votes: {type: Number, default: 0},
+});
+
+const Candidate = mongoose.model('Candidate', CandidateSchema);
+
+app.post('/api/candidates', async (req, res) => {
+ const candidate = new Candidate({
+     name: req.body.name,
+ });
+ try {
+     console.log("Post candidate");
+     console.log(candidate);
+     await candidate.save();
+     res.send(candidate);
+ } catch (error) {
+     console.log(error);
+     res.sendStatus(500);
+ }
+  });
+
+
+app.get('/api/candidates', async (req, res) => {
+  try {
+      let candidates = await Candidate.find();
+      res.send(candidates);
+  } catch (error) {
+      console.log(error);
+      res.sendStatus(500);
+  }
+});
+
+app.delete('/api/candidates/:id', async (req, res) => {
+    try{
+        console.log("delete candidate");
+        console.log(Candidate);
+        await Candidate.deleteOne({_id: req.params.id});
+        res.sendStatus(200);
+    } catch (error) {
+        console.log(error);
+        res.sendStatus(500);
+    }
+});
+
+app.put('/api/candidates/:id', async (req, res) => {
+    try {
+        console.log("incrementVote");
+        let candidate = await Candidate.findOne({_id: req.params.id});
+        console.log(candidate.votes);
+        candidate.votes += 1;
+        await candidate.save();
+        res.sendStatus(200);
+    } catch(error) {
+        console.log(error);
+        res.sendStatus(500);
+    }
+});
+
+app.listen(3002, () => console.log('Server listening on port 3002!'));
