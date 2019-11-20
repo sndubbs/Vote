@@ -75,3 +75,22 @@ app.put('/api/candidates/:id', async (req, res) => {
 });
 
 app.listen(3002, () => console.log('Server listening on port 3002!'));
+
+/* Create GitHub repo
+clone github repo
+cd to your new repo
+mkdir public
+cd public
+touch index.html
+touch style.css
+cd..
+touch server.js
+nvm use stable
+npm init
+npm install express body-parser
+cd public
+touch admin.html
+touch admin.js
+npm start
+npm install --save mongoose
+*/
